@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>医院端配置方案 v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#141e2d;
+  --navy:#0c2044;
+  --navy2:#1a3a6c;
+  --navy3:#2860a8;
+  --gold:#b07d2a;
+  --gold-l:#e8c26a;
+  --cream:#f5f3ee;
+  --white:#fff;
+  --border:#dce3ef;
+  --muted:#728096;
+  --green-d:#0a3d24;
+  --green:#1a7a50;
+  --green-l:#e0f5eb;
+  --blue-l:#ebf2ff;
+  --amber-l:#fdf5e6;
+  --amber-d:#7a4800;
+  --red:#b92b2b;
+  --C-col:#5a6475;
+  --B1-col:#b06800;
+  --B2-col:#1650a0;
+  --A-col:#0b5230;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Serif SC','PingFang SC',serif;background:var(--cream);color:var(--ink);padding:20px 16px 60px;font-size:13px;line-height:1.65;}
+.wrap{max-width:1180px;margin:0 auto;}
+
+/* ── HEADER ── */
+.hdr{background:var(--navy);color:#fff;border-radius:14px;padding:30px 36px 26px;margin-bottom:16px;position:relative;overflow:hidden;}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;background:radial-gradient(circle,rgba(184,136,46,.18),transparent 70%);border-radius:50%;}
+.hdr-label{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;font-family:'DM Mono',monospace;opacity:.35;margin-bottom:10px;}
+.hdr-title{font-size:21px;font-weight:700;line-height:1.3;position:relative;z-index:1;}
+.hdr-sub{font-size:11px;opacity:.4;margin-top:6px;font-family:'DM Mono',monospace;}
+.hdr-note{margin-top:18px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px 18px;font-size:11px;line-height:1.9;color:rgba(255,255,255,.55);}
+.hdr-note b{color:var(--gold-l);}
+
+/* ── UPGRADE RIVER ── */
+.river{display:flex;align-items:stretch;gap:0;margin-bottom:16px;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(12,32,68,.1);}
+.rv-step{flex:1;padding:18px 15px;position:relative;display:flex;flex-direction:column;gap:5px;}
+.rv-step::after{content:'→';position:absolute;right:-14px;top:50%;transform:translateY(-50%);font-size:20px;color:rgba(255,255,255,.3);z-index:2;font-weight:300;}
+.rv-step:last-child::after{display:none;}
+.rvC{background:#4a5568;}
+.rvB1{background:var(--B1-col);}
+.rvExp{background:#c8820a;}
+.rvB2{background:var(--B2-col);}
+.rvA{background:var(--A-col);}
+.rv-tag{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-family:'DM Mono',monospace;opacity:.6;}
+.rv-name{font-size:13px;font-weight:700;color:#fff;line-height:1.3;}
+.rv-price{font-size:16px;font-weight:700;font-family:'DM Mono',monospace;color:rgba(255,255,255,.9);margin-top:3px;}
+.rv-delta{display:inline-block;background:rgba(255,255,255,.15);font-size:10px;padding:1px 8px;border-radius:10px;color:rgba(255,255,255,.8);margin-top:4px;font-family:'DM Mono',monospace;}
+.rv-note{font-size:10px;opacity:.55;margin-top:4px;line-height:1.5;}
+
+/* ── CARD ── */
+.card{background:var(--white);border-radius:13px;padding:24px 26px;margin-bottom:14px;border:1px solid rgba(12,30,56,.06);box-shadow:0 1px 3px rgba(12,30,56,.04),0 4px 12px rgba(12,30,56,.03);}
+.sec{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:20px;display:flex;align-items:center;gap:9px;}
+.sec::before{content:'';width:4px;height:17px;background:linear-gradient(var(--gold),var(--navy3));border-radius:2px;flex-shrink:0;}
+.sn{background:var(--navy);color:#fff;font-size:10px;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;flex-shrink:0;}
+
+/* ── BIG COMPARISON TABLE ── */
+.cmp-wrap{overflow-x:auto;}
+.cmp{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;}
+.cmp th,.cmp td{border:none;}
+
+/* header row */
+.ch{vertical-align:top;}
+.ch.lbl-col{background:#f0f3f9;width:160px;min-width:140px;padding:14px 14px;border-radius:8px 0 0 0;border-bottom:2px solid var(--border);}
+.ch.c-C{background:linear-gradient(160deg,#4a5568,#374151);border-bottom:3px solid #6b7280;border-left:2px solid #6b7280;padding:14px 13px;}
+.ch.c-B1{background:linear-gradient(160deg,#92400e,#b06800);border-bottom:3px solid var(--B1-col);border-left:2px solid var(--B1-col);padding:14px 13px;}
+.ch.c-B2a{background:linear-gradient(160deg,#1e3a8a,#1d4ed8);border-bottom:3px solid #2563eb;border-left:2px solid #2563eb;padding:14px 13px;}
+.ch.c-B2b{background:linear-gradient(160deg,#1e40af,#1650a0);border-bottom:3px solid #1d4ed8;border-left:2px solid #1d4ed8;padding:14px 13px;}
+.ch.c-B2c{background:linear-gradient(160deg,#1e3a8a,#163996);border-bottom:3px solid #1d4ed8;border-left:2px solid #1d4ed8;padding:14px 13px;}
+.ch.c-A{background:linear-gradient(160deg,#064e3b,#0b5230);border-bottom:3px solid #059669;border-left:2px solid #059669;padding:14px 13px;border-radius:0 8px 0 0;}
+.ch-badge{font-size:9px;font-weight:700;letter-spacing:.5px;display:inline-block;padding:2px 8px;border-radius:8px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.85);margin-bottom:5px;}
+.ch-name{font-size:12px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:3px;}
+.ch-price{font-size:17px;font-weight:700;font-family:'DM Mono',monospace;color:#fff;line-height:1;}
+.ch-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;line-height:1.5;}
+.ch-delta{display:inline-block;margin-top:5px;background:rgba(255,255,255,.18);font-size:10px;padding:2px 9px;border-radius:10px;color:rgba(255,255,255,.85);font-family:'DM Mono',monospace;}
+
+/* data rows */
+.cmp .sh td{background:var(--navy);color:rgba(255,255,255,.5);font-size:10px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;padding:6px 14px;}
+.cmp .dr td{padding:10px 13px;border-bottom:1px solid var(--border);vertical-align:middle;text-align:center;}
+.cmp .dr.alt td{background:#f9fafc;}
+.cmp .dr td.lbl-col{text-align:left;font-size:11px;color:var(--muted);font-weight:600;background:#f5f7fb;}
+.cmp .dr.alt td.lbl-col{background:#f1f4f9;}
+.cmp .dr td.b-C{border-left:1px solid #e2e5eb;}
+.cmp .dr td.b-B1{border-left:1px solid #fcd9a0;}
+.cmp .dr td.b-B2a,.cmp .dr td.b-B2b,.cmp .dr td.b-B2c{border-left:1px solid #bfdbfe;}
+.cmp .dr td.b-A{border-left:1px solid #a7f3d0;}
+tr:hover td{filter:brightness(.975);}
+.cmp .hl td{background:#f0fdf6 !important;}
+.cmp .hl td.lbl-col{color:var(--green-d)!important;font-weight:700!important;}
+
+.yes{color:#10b981;font-size:15px;}
+.no{color:#d1d5db;font-size:15px;}
+.opt{color:#d97706;font-size:11px;font-weight:700;}
+.m{font-family:'DM Mono',monospace;font-weight:700;}
+.win{display:inline-block;padding:2px 8px;border-radius:7px;font-size:10px;font-weight:700;margin:1px 0;line-height:1.5;}
+.wC{background:#e5e7eb;color:#374151;}
+.wB1{background:#fef3c7;color:#92400e;}
+.wB2{background:#dbeafe;color:#1e40af;}
+.wA{background:#d1fae5;color:#065f46;}
+.wBridge{background:#fde68a;color:#78350f;}
+
+/* ── EXPANSION PACK ── */
+.exp-row{display:grid;grid-template-columns:1fr 2fr;gap:18px;align-items:start;}
+.exp-card{border-radius:12px;padding:20px 20px;border:2px solid var(--B1-col);background:linear-gradient(160deg,#fffbf0,#fff7e6);}
+.exp-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 10px;border-radius:9px;background:var(--B1-col);color:#fff;margin-bottom:10px;}
+.exp-title{font-size:15px;font-weight:700;color:var(--amber-d);margin-bottom:4px;}
+.exp-price{font-size:24px;font-weight:700;font-family:'DM Mono',monospace;color:var(--navy);margin-bottom:14px;line-height:1;}
+.exp-item{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed rgba(0,0,0,.09);font-size:12px;gap:8px;}
+.exp-item:last-of-type{border-bottom:none;}
+.exp-il{color:#6b7280;}
+.exp-iv{font-weight:700;font-family:'DM Mono',monospace;text-align:right;}
+.exp-highlight{margin-top:12px;background:#fef3c7;border-radius:7px;padding:9px 12px;font-size:11px;font-weight:700;color:#92400e;text-align:center;line-height:1.6;}
+.bridge-box{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);border-radius:12px;padding:20px 22px;color:#fff;}
+.bb-title{font-size:12px;font-weight:700;color:var(--gold-l);margin-bottom:14px;}
+.bb-path{display:flex;flex-direction:column;gap:10px;}
+.bb-step{display:flex;align-items:baseline;gap:10px;font-size:12px;}
+.bb-label{color:rgba(255,255,255,.45);width:90px;flex-shrink:0;font-size:11px;}
+.bb-amount{font-family:'DM Mono',monospace;font-weight:700;color:#fff;}
+.bb-note{font-size:10px;color:rgba(255,255,255,.35);margin-left:4px;}
+.bb-divider{border:none;border-top:1px solid rgba(255,255,255,.1);margin:6px 0;}
+.bb-result{display:flex;align-items:center;justify-content:space-between;margin-top:4px;}
+.bb-r-label{font-size:11px;color:rgba(255,255,255,.55);}
+.bb-r-val{font-size:16px;font-weight:700;font-family:'DM Mono',monospace;color:var(--gold-l);}
+.bb-vs{font-size:11px;color:rgba(255,255,255,.3);margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1);line-height:1.8;}
+.bb-vs b{color:#6ee7b7;}
+
+/* ── CREDIT BOX ── */
+.credit-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.credit-card{border-radius:11px;padding:18px 16px;border:1px solid var(--border);}
+.cc-from{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;font-family:'DM Mono',monospace;color:var(--muted);margin-bottom:8px;}
+.cc-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:13px;}
+.cc-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;gap:6px;}
+.cc-row:last-child{border-bottom:none;}
+.cc-l{color:var(--muted);}
+.cc-v{font-family:'DM Mono',monospace;font-weight:700;}
+.cc-v.pos{color:var(--green);}
+.cc-v.neg{color:var(--red);}
+.cc-hook{margin-top:12px;padding:9px 11px;border-radius:7px;font-size:11px;font-weight:700;line-height:1.6;text-align:center;}
+
+/* ── TRIGGERS ── */
+.trig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.trig{border-radius:10px;padding:16px;border:1px solid var(--border);background:var(--white);}
+.trig-icon{font-size:20px;margin-bottom:7px;}
+.trig-from{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-family:'DM Mono',monospace;color:var(--muted);margin-bottom:5px;}
+.trig-title{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:7px;}
+.trig-body{font-size:11px;color:#5a6478;line-height:1.8;}
+.trig-body b{color:var(--ink);}
+
+/* ── NOTE / INFO ── */
+.note{background:var(--amber-l);border-left:3px solid var(--gold);padding:12px 15px;border-radius:0 8px 8px 0;font-size:11px;color:var(--amber-d);margin-top:14px;line-height:1.85;}
+.note b{color:#5a3500;}
+.info{background:var(--blue-l);border-left:3px solid var(--navy3);padding:12px 15px;border-radius:0 8px 8px 0;font-size:11px;color:var(--navy2);margin-top:14px;line-height:1.85;}
+.info b{color:var(--navy);}
+.success-note{background:var(--green-l);border-left:3px solid var(--green);padding:12px 15px;border-radius:0 8px 8px 0;font-size:11px;color:var(--green-d);margin-top:14px;line-height:1.85;}
+.success-note b{color:var(--green-d);}
+
+/* ── CALC ── */
+.calc-wrap{background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:13px;padding:24px 26px;}
+.calc-title{color:var(--gold-l);font-size:13px;font-weight:700;margin-bottom:18px;}
+.calc-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.ci label{display:block;font-size:9px;font-weight:600;color:rgba(255,255,255,.4);margin-bottom:6px;letter-spacing:.9px;text-transform:uppercase;font-family:'DM Mono',monospace;}
+.ci select,.ci input{width:100%;padding:8px 11px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:7px;font-size:12px;color:#fff;outline:none;font-family:'Noto Serif SC',serif;}
+.ci select:focus,.ci input:focus{border-color:rgba(184,136,46,.65);}
+.ci select option{background:#163354;}
+.res-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.rc{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 12px;text-align:center;}
+.rc.gc{background:linear-gradient(135deg,rgba(184,136,46,.28),rgba(184,136,46,.14));border-color:rgba(184,136,46,.4);}
+.rc.ec{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);}
+.rc-lbl{font-size:10px;color:rgba(255,255,255,.4);margin-bottom:7px;line-height:1.4;}
+.rc-val{font-size:18px;font-weight:700;color:#fff;font-family:'DM Mono',monospace;line-height:1;}
+.gc .rc-val{color:var(--gold-l);font-size:21px;}
+.ec .rc-val{color:#6ee7b7;}
+.rc-sub{font-size:10px;color:rgba(255,255,255,.3);margin-top:5px;line-height:1.4;}
+.calc-foot{font-size:10px;color:rgba(255,255,255,.28);margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.09);font-family:'DM Mono',monospace;line-height:1.7;}
+
+@media(max-width:1000px){
+  .river{flex-direction:column;}
+  .rv-step::after{display:none;}
+  .exp-row,.credit-wrap,.trig-grid{grid-template-columns:1fr;}
+  .calc-row,.res-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-label">医院端配置方案 v2</div>
+  <div class="hdr-title">呼吸监测设备 · 四档 + 扩容路径</div>
+  <div class="hdr-sub">C 免费试用 → B1 ¥5万免招标 → （+扩容包）→ B2 ¥10～40万 → A ¥50～80万</div>
+  <div class="hdr-note">
+    <b>核心定价心理：</b>每一档向上升级，医院感受到的净增投入都很小——B1抵扣后升B2只需多付¥5万，B2顶配到A旗舰版也只差一步。<br>
+    <b>扩容包设计：</b>5台主机 + 50片耗材，与B1基础包规格完全相同，两包合计即达到B2入门的10台主机配置。
+  </div>
+</div>
+
+<!-- UPGRADE RIVER -->
+<div class="river">
+  <div class="rv-step rvC">
+    <div class="rv-tag">C · 试用</div>
+    <div class="rv-name">免费借用<br>1～3台主机</div>
+    <div class="rv-price">¥0</div>
+    <div class="rv-note">科室零投入<br>耗材¥120/片</div>
+  </div>
+  <div class="rv-step rvB1">
+    <div class="rv-tag">B1 · 起步</div>
+    <div class="rv-name">5台主机<br>小工作站</div>
+    <div class="rv-price">¥5万</div>
+    <div class="rv-delta">免招标 · 科主任批</div>
+    <div class="rv-note">50片耗材包含</div>
+  </div>
+  <div class="rv-step rvExp">
+    <div class="rv-tag">扩容包 · 桥接</div>
+    <div class="rv-name">再加5台<br>直升10台</div>
+    <div class="rv-price">¥4.8万</div>
+    <div class="rv-delta">仍免招标</div>
+    <div class="rv-note">B1+扩容=¥9.8万<br>≈ B2入门实付</div>
+  </div>
+  <div class="rv-step rvB2">
+    <div class="rv-tag">B2 · 科室标准</div>
+    <div class="rv-name">10～25台<br>标准工作站</div>
+    <div class="rv-price">¥10～40万</div>
+    <div class="rv-delta">B1全额抵扣</div>
+    <div class="rv-note">耗材包200～1000片</div>
+  </div>
+  <div class="rv-step rvA">
+    <div class="rv-tag">A · 旗舰全院</div>
+    <div class="rv-name">25～50台<br>全院管理</div>
+    <div class="rv-price">¥50～80万</div>
+    <div class="rv-delta">B2顶配再多¥10万</div>
+    <div class="rv-note">耗材包1500片·3月量</div>
+  </div>
+</div>
+
+<!-- COMPARISON TABLE -->
+<div class="card">
+  <div class="sec"><span class="sn">①</span>全档位配置对比（经销商面向医院的核心销售工具）</div>
+  <div class="cmp-wrap">
+    <table class="cmp">
+      <thead>
+        <tr>
+          <th class="ch lbl-col">配置项</th>
+          <th class="ch c-C">
+            <span class="ch-badge">C · 轻量试用</span>
+            <div class="ch-name">免费主机借用</div>
+            <div class="ch-price">¥0</div>
+            <div class="ch-sub">月均 &lt;100次<br>观望试用期</div>
+          </th>
+          <th class="ch c-B1">
+            <span class="ch-badge">B1 · 免招标起步</span>
+            <div class="ch-name">5万基础包</div>
+            <div class="ch-price">¥5万</div>
+            <div class="ch-sub">月均 50～150次</div>
+            <div class="ch-delta">科主任直批 ✓</div>
+          </th>
+          <th class="ch c-B2a">
+            <span class="ch-badge">B2-基础</span>
+            <div class="ch-name">10台入门版</div>
+            <div class="ch-price">¥10万</div>
+            <div class="ch-sub">月均 100～200次</div>
+            <div class="ch-delta">B1抵扣后净付¥5万</div>
+          </th>
+          <th class="ch c-B2b">
+            <span class="ch-badge">B2-标准</span>
+            <div class="ch-name">15台标准版</div>
+            <div class="ch-price">¥20万</div>
+            <div class="ch-sub">月均 200～300次</div>
+            <div class="ch-delta">B1抵扣后净付¥15万</div>
+          </th>
+          <th class="ch c-B2c">
+            <span class="ch-badge">B2-完整</span>
+            <div class="ch-name">25台完整版</div>
+            <div class="ch-price">¥40万</div>
+            <div class="ch-sub">月均 300次+</div>
+            <div class="ch-delta">距旗舰版仅差¥10万</div>
+          </th>
+          <th class="ch c-A">
+            <span class="ch-badge">A · 旗舰全院</span>
+            <div class="ch-name">全院管理系统</div>
+            <div class="ch-price">¥50～80万</div>
+            <div class="ch-sub">月均 500次+</div>
+            <div class="ch-delta">全院规模效益最优</div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- 设备 -->
+        <tr class="sh"><td colspan="7">▸ 设备配置</td></tr>
+        <tr class="dr">
+          <td class="lbl-col">主机数量</td>
+          <td class="b-C"><span class="m" style="color:var(--C-col)">1～3台</span><br><span style="font-size:10px;color:var(--muted)">经销商借用</span></td>
+          <td class="b-B1"><span class="m" style="color:var(--B1-col)">5台</span><br><span style="font-size:10px;color:var(--muted)">医院所有权</span></td>
+          <td class="b-B2a"><span class="m" style="color:var(--B2-col)">10台</span></td>
+          <td class="b-B2b"><span class="m" style="color:var(--B2-col)">15台</span></td>
+          <td class="b-B2c"><span class="m" style="color:var(--B2-col)">25台</span></td>
+          <td class="b-A"><span class="m" style="color:var(--A-col)">25～50台</span><br><span style="font-size:10px;color:var(--muted)">全院覆盖</span></td>
+        </tr>
+        <tr class="dr alt">
+          <td class="lbl-col">工作站</td>
+          <td class="b-C"><span class="no">✗</span></td>
+          <td class="b-B1"><span class="yes">✓</span><br><span style="font-size:10px;color:var(--B1-col);font-weight:700">小型（标配）</span></td>
+          <td class="b-B2a"><span class="yes">✓</span><br><span style="font-size:10px;color:var(--B2-col);font-weight:700">标准（标配）</span></td>
+          <td class="b-B2b"><span class="yes">✓</span><br><span style="font-size:10px;color:var(--B2-col);font-weight:700">标准（标配）</span></td>
+          <td class="b-B2c"><span class="yes">✓</span><br><span style="font-size:10px;color:var(--B2-col);font-weight:700">标准（标配）</span></td>
+          <td class="b-A"><span class="yes">✓</span><br><span style="font-size:10px;color:var(--A-col);font-weight:700">旗舰全配</span></td>
+        </tr>
+        <tr class="dr">
+          <td class="lbl-col">HIS系统对接</td>
+          <td class="b-C"><span class="no">✗</span></td>
+          <td class="b-B1"><span class="no">✗</span></td>
+          <td class="b-B2a"><span class="opt">可选 +¥2.5万</span></td>
+          <td class="b-B2b"><span class="opt">可选 +¥2.5万</span></td>
+          <td class="b-B2c"><span class="opt">可选 +¥3万</span></td>
+          <td class="b-A"><span class="yes">✓</span> 全包含</td>
+        </tr>
+        <tr class="dr alt">
+          <td class="lbl-col">联网 & 报告打印</td>
+          <td class="b-C"><span class="no">✗</span></td>
+          <td class="b-B1">本地基础</td>
+          <td class="b-B2a"><span class="opt">可选</span></td>
+          <td class="b-B2b"><span class="opt">可选</span></td>
+          <td class="b-B2c"><span class="opt">可选</span></td>
+          <td class="b-A"><span class="yes">✓</span> 全包</td>
+        </tr>
+
+        <!-- 耗材 -->
+        <tr class="sh"><td colspan="7">▸ 耗材配套</td></tr>
+        <tr class="dr hl">
+          <td class="lbl-col" style="font-weight:700;color:var(--green-d)">随货耗材包</td>
+          <td class="b-C" style="color:var(--muted);font-size:11px">无<br>¥120/片采购</td>
+          <td class="b-B1">
+            <span style="font-weight:700;color:var(--B1-col)">50片</span><br>
+            <span class="m" style="font-size:12px;color:var(--B1-col)">¥90/片</span><br>
+            <span style="font-size:10px;color:var(--muted)">省¥1,500</span>
+          </td>
+          <td class="b-B2a">
+            <span style="font-weight:700;color:var(--B2-col)">200片</span><br>
+            <span class="m" style="font-size:12px;color:var(--B2-col)">¥92/片</span><br>
+            <span style="font-size:10px;color:var(--muted)">省¥5,600</span>
+          </td>
+          <td class="b-B2b">
+            <span style="font-weight:700;color:var(--B2-col)">500片</span><br>
+            <span class="m" style="font-size:12px;color:var(--B2-col)">¥90/片</span><br>
+            <span style="font-size:10px;color:var(--muted)">省¥15,000</span>
+          </td>
+          <td class="b-B2c">
+            <span style="font-weight:700;color:var(--B2-col)">1000片</span><br>
+            <span class="m" style="font-size:12px;color:var(--B2-col)">¥88/片</span><br>
+            <span style="font-size:10px;color:var(--muted)">省¥32,000</span>
+          </td>
+          <td class="b-A">
+            <span style="font-weight:700;color:var(--A-col)">1500片（3月）</span><br>
+            <span class="m" style="font-size:12px;color:var(--A-col)">¥85/片</span><br>
+            <span style="font-size:10px;color:var(--muted)">省¥52,500</span>
+          </td>
+        </tr>
+        <tr class="dr alt">
+          <td class="lbl-col">后续耗材采购</td>
+          <td class="b-C"><span class="m">¥120/片</span></td>
+          <td class="b-B1"><span class="m">¥120/片</span></td>
+          <td class="b-B2a"><span class="m">¥120/片</span></td>
+          <td class="b-B2b"><span class="m">¥120/片</span></td>
+          <td class="b-B2c"><span class="m">¥120/片</span></td>
+          <td class="b-A"><span class="m">¥120/片</span></td>
+        </tr>
+
+        <!-- 采购 -->
+        <tr class="sh"><td colspan="7">▸ 采购方式</td></tr>
+        <tr class="dr">
+          <td class="lbl-col">采购流程</td>
+          <td class="b-C" style="font-size:11px;font-weight:700;color:var(--C-col)">无需采购</td>
+          <td class="b-B1" style="font-size:11px;font-weight:700;color:var(--B1-col)">直接采购<br>（免招标）</td>
+          <td class="b-B2a" style="font-size:11px;color:var(--muted)">招标采购</td>
+          <td class="b-B2b" style="font-size:11px;color:var(--muted)">招标采购</td>
+          <td class="b-B2c" style="font-size:11px;color:var(--muted)">招标采购</td>
+          <td class="b-A" style="font-size:11px;color:var(--muted)">重大项目立项</td>
+        </tr>
+        <tr class="dr alt">
+          <td class="lbl-col">决策层级</td>
+          <td class="b-C" style="font-size:11px">科室主任</td>
+          <td class="b-B1" style="font-size:11px;font-weight:700;color:var(--B1-col)">科室主任直批</td>
+          <td class="b-B2a" style="font-size:11px">科室+设备科</td>
+          <td class="b-B2b" style="font-size:11px">科室+设备科+院长</td>
+          <td class="b-B2c" style="font-size:11px">院长专项审批</td>
+          <td class="b-A" style="font-size:11px">院委会立项</td>
+        </tr>
+
+        <!-- 升级路径 -->
+        <tr class="sh"><td colspan="7">▸ 升级路径</td></tr>
+        <tr class="dr hl">
+          <td class="lbl-col" style="font-weight:700;color:var(--green-d)">向上升级方式</td>
+          <td class="b-C" style="text-align:left;padding-left:10px;font-size:11px;line-height:1.8">
+            <span class="win wB1">→ B1</span> 推¥5万套餐<br>科室有意向即提
+          </td>
+          <td class="b-B1" style="text-align:left;padding-left:10px;font-size:11px;line-height:1.9">
+            <span class="win wBridge">扩容包</span> 再加5台 ¥4.8万<br>
+            <span style="font-style:italic;color:var(--muted)">合计10台≈B2入门</span><br>
+            <span class="win wB2">→ B2</span> B1<b style="color:var(--B2-col)">全额抵扣</b>升级
+          </td>
+          <td class="b-B2a" style="text-align:left;padding-left:10px;font-size:11px;line-height:1.8">
+            <span class="win wB2">→ B2-标准</span> 加主机+耗材<br>差价补缴
+          </td>
+          <td class="b-B2b" style="text-align:left;padding-left:10px;font-size:11px;line-height:1.8">
+            <span class="win wB2">→ B2-完整</span> 差价补缴<br>
+            <span class="win wA">→ A</span> 全院升级
+          </td>
+          <td class="b-B2c" style="text-align:left;padding-left:10px;font-size:11px;line-height:1.8">
+            <span class="win wA">→ A 旗舰</span><br>
+            <b style="color:var(--A-col)">净加≈¥10万</b>，全院全配
+          </td>
+          <td class="b-A" style="font-size:11px;color:var(--A-col);font-weight:700">全院最终形态<br>主机池可扩充</td>
+        </tr>
+
+        <!-- ROI -->
+        <tr class="sh"><td colspan="7">▸ 医院投资回报（均价¥250/次 · 月均测试量参考）</td></tr>
+        <tr class="dr">
+          <td class="lbl-col">参考月测试量</td>
+          <td class="b-C"><span class="m">50次</span></td>
+          <td class="b-B1"><span class="m">100次</span></td>
+          <td class="b-B2a"><span class="m">150次</span></td>
+          <td class="b-B2b"><span class="m">250次</span></td>
+          <td class="b-B2c"><span class="m">350次</span></td>
+          <td class="b-A"><span class="m">500次</span></td>
+        </tr>
+        <tr class="dr alt">
+          <td class="lbl-col">月净贡献（扣耗材）</td>
+          <td class="b-C"><span class="m" style="color:var(--green)">¥6,500</span></td>
+          <td class="b-B1"><span class="m" style="color:var(--green)">¥13,000</span></td>
+          <td class="b-B2a"><span class="m" style="color:var(--green)">¥19,500</span></td>
+          <td class="b-B2b"><span class="m" style="color:var(--green)">¥32,500</span></td>
+          <td class="b-B2c"><span class="m" style="color:var(--green)">¥45,500</span></td>
+          <td class="b-A"><span class="m" style="color:var(--green)">¥65,000</span></td>
+        </tr>
+        <tr class="dr hl">
+          <td class="lbl-col" style="font-weight:700;color:var(--green-d)">设备回本周期</td>
+          <td class="b-C"><span class="win wC">零投入 即用</span></td>
+          <td class="b-B1"><span class="win wB1">约3.8个月 ✓</span></td>
+          <td class="b-B2a"><span class="win wB2">净付¥5万<br>约2.6月 ✓</span></td>
+          <td class="b-B2b"><span class="win wB2">约6.2个月 ✓</span></td>
+          <td class="b-B2c"><span class="win wB2">约8.8个月 ✓</span></td>
+          <td class="b-A"><span class="win wA">约9～10个月 ✓</span></td>
+        </tr>
+        <tr class="dr alt">
+          <td class="lbl-col" style="font-weight:700;color:var(--navy)">该档核心吸引力</td>
+          <td class="b-C" style="text-align:left;padding-left:10px;font-size:11px;line-height:1.8">
+            <span class="win wC">零风险</span> 先用再说<br>
+            <span class="win wC">先验证</span> 科室再决策
+          </td>
+          <td class="b-B1" style="text-align:left;padding-left:10px;font-size:11px;line-height:1.8">
+            <span class="win wB1">免招标</span> 今天拍板<br>
+            <span class="win wB1">不沉没</span> 全额抵B2<br>
+            <span class="win wB1">可扩容</span> 加包升10台
+          </td>
+          <td class="b-B2a" style="text-align:left;padding-left:10px;font-size:11px;line-height:1.8">
+            <span class="win wB2">实付¥5万</span> 极快回本<br>
+            <span class="win wB2">10台起</span> 日均10例
+          </td>
+          <td class="b-B2b" style="text-align:left;padding-left:10px;font-size:11px;line-height:1.8">
+            <span class="win wB2">500片耗材省¥15k</span><br>
+            <span class="win wB2">可联网</span> HIS可选
+          </td>
+          <td class="b-B2c" style="text-align:left;padding-left:10px;font-size:11px;line-height:1.8">
+            <span class="win wB2">1000片省¥32k</span><br>
+            <span class="win wA">升旗舰</span> 仅差¥10万
+          </td>
+          <td class="b-A" style="text-align:left;padding-left:10px;font-size:11px;line-height:1.8">
+            <span class="win wA">耗材最省</span> ¥85/片<br>
+            <span class="win wA">全生态</span> HIS全打通<br>
+            <span class="win wA">院级数据</span> 统一管理
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="success-note">
+    <b>定价锚点验证：</b>
+    B2完整版¥40万，随货1000片耗材省下¥32,000；旗舰版比B2完整版仅贵¥10万（取¥50万底价），多了全套HIS+1500片省¥52,500——医院很容易算出旗舰版综合更合算。这是「再多¥10万就全院了」心理的具体数字支撑。
+  </div>
+</div>
+
+<!-- EXPANSION PACK -->
+<div class="card">
+  <div class="sec"><span class="sn">②</span>B1 扩容包（C→B1→B2 的无缝桥接工具）</div>
+  <div class="exp-row">
+    <div class="exp-card">
+      <span class="exp-badge">扩容包 · 唯一档</span>
+      <div class="exp-title">5台主机 + 50片耗材</div>
+      <div class="exp-price">¥4.8万</div>
+      <div class="exp-item"><span class="exp-il">新增主机</span><span class="exp-iv" style="color:var(--B1-col)">5台（医院所有权）</span></div>
+      <div class="exp-item"><span class="exp-il">随货耗材包</span><span class="exp-iv">50片 · ¥90/片嵌入价</span></div>
+      <div class="exp-item"><span class="exp-il">耗材包价值</span><span class="exp-iv">¥4,500（vs挂网¥6,000）</span></div>
+      <div class="exp-item"><span class="exp-il">采购方式</span><span class="exp-iv" style="color:var(--green)">免招标 · 单次¥4.8万 ✓</span></div>
+      <div class="exp-item"><span class="exp-il">B1+扩容后合计</span><span class="exp-iv">10台主机 · 合计¥9.8万</span></div>
+      <div class="exp-highlight">
+        规格与B1完全相同（5台+50片）<br>两包叠加 = B2基础入门配置
+      </div>
+    </div>
+    <div class="bridge-box">
+      <div class="bb-title">💡 扩容包 vs 直接升B2 · 经销商话术对比</div>
+      <div class="bb-path">
+        <div style="font-size:11px;color:rgba(255,255,255,.45);margin-bottom:6px;font-weight:700;">路径A · 买扩容包</div>
+        <div class="bb-step"><span class="bb-label">已付B1</span><span class="bb-amount">¥5万</span></div>
+        <div class="bb-step"><span class="bb-label">购扩容包</span><span class="bb-amount">¥4.8万</span></div>
+        <hr class="bb-divider">
+        <div class="bb-result">
+          <span class="bb-r-label">合计支出</span>
+          <span class="bb-r-val">¥9.8万 · 10台 · 耗材100片</span>
+        </div>
+      </div>
+      <div class="bb-vs">
+        <div style="font-size:11px;color:rgba(255,255,255,.45);margin-bottom:8px;font-weight:700;">路径B · 直接升B2基础版（推荐）</div>
+        B2基础版 ¥10万，含10台+标准工作站+<b>200片耗材</b><br>
+        B1全额抵扣 → <b>实付¥5万</b>，比扩容包便宜¥4.8万<br>
+        多拿：<b>标准工作站升级 + 多100片耗材</b>
+        <div style="margin-top:10px;padding:8px 10px;background:rgba(110,231,183,.1);border-radius:6px;color:#6ee7b7;font-size:11px;font-weight:700;">
+          「扩容包¥4.8万 vs 直升B2实付¥5万，多¥2000拿标准站+多100片，B2更划算」
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note" style="margin-top:14px">
+    <b>扩容包的真实用途：</b>不是让医院长期停在扩容包阶段，而是给「想扩产能但暂时不想走招标」的科室一个即时解决方案，同时作为比价工具，让医院自己发现直升B2更合算，推动升级决策。经销商二次获益的来源正在于此。
+  </div>
+</div>
+
+<!-- CREDIT POLICY -->
+<div class="card">
+  <div class="sec"><span class="sn">③</span>B1 → B2 全额抵扣政策（升级心理障碍消除）</div>
+  <div class="credit-wrap">
+    <div class="credit-card">
+      <div class="cc-from">场景一</div>
+      <div class="cc-title">C → B1 → B2基础（¥10万）</div>
+      <div class="cc-row"><span class="cc-l">B2基础原价</span><span class="cc-v">¥100,000</span></div>
+      <div class="cc-row"><span class="cc-l">B1已付（抵扣）</span><span class="cc-v neg">-¥50,000</span></div>
+      <div class="cc-row"><span class="cc-l">实际补缴</span><span class="cc-v pos">¥50,000</span></div>
+      <div class="cc-row"><span class="cc-l">vs直接买B2</span><span class="cc-v" style="color:var(--muted)">¥100,000</span></div>
+      <div class="cc-row"><span class="cc-l">医院感知节省</span><span class="cc-v pos">¥50,000 ✓</span></div>
+      <div class="cc-hook" style="background:#fef3c7;color:#92400e;">
+        「C用了2个月 → B1¥5万 → 再¥5万就拿到10台标准版」<br>
+        <b>总路径仅¥10万，和直接买B2一样</b>
+      </div>
+    </div>
+    <div class="credit-card">
+      <div class="cc-from">场景二</div>
+      <div class="cc-title">B1 → B2标准（¥20万）</div>
+      <div class="cc-row"><span class="cc-l">B2标准原价</span><span class="cc-v">¥200,000</span></div>
+      <div class="cc-row"><span class="cc-l">B1已付（抵扣）</span><span class="cc-v neg">-¥50,000</span></div>
+      <div class="cc-row"><span class="cc-l">实际补缴</span><span class="cc-v pos">¥150,000</span></div>
+      <div class="cc-row"><span class="cc-l">获得耗材升级</span><span class="cc-v pos">50→500片</span></div>
+      <div class="cc-row"><span class="cc-l">耗材省下</span><span class="cc-v pos">额外¥13,500</span></div>
+      <div class="cc-hook" style="background:#dbeafe;color:#1e40af;">
+        「当初¥5万是这笔大单的首付，不是沉没成本」<br>
+        <b>耗材从50→500片，单片省¥30</b>
+      </div>
+    </div>
+    <div class="credit-card">
+      <div class="cc-from">场景三 · 最优路径</div>
+      <div class="cc-title">B2完整 → A旗舰（「再多¥10万」）</div>
+      <div class="cc-row"><span class="cc-l">B2完整顶配</span><span class="cc-v">¥400,000</span></div>
+      <div class="cc-row"><span class="cc-l">A旗舰底价</span><span class="cc-v">¥500,000</span></div>
+      <div class="cc-row"><span class="cc-l">升级净差价</span><span class="cc-v pos">+¥100,000</span></div>
+      <div class="cc-row"><span class="cc-l">多拿耗材（1500-1000）</span><span class="cc-v pos">+500片（¥85 vs ¥88）</span></div>
+      <div class="cc-row"><span class="cc-l">多拿HIS+全院管理</span><span class="cc-v pos">全包含 ✓</span></div>
+      <div class="cc-hook" style="background:#d1fae5;color:#065f46;">
+        「B2顶配¥40万，再加¥10万就全院了」<br>
+        <b>这是推A档最有力的一句话</b>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UPGRADE TRIGGERS -->
+<div class="card">
+  <div class="sec"><span class="sn">④</span>自然升级触发信号（经销商回访时观察的指标）</div>
+  <div class="trig-grid">
+    <div class="trig">
+      <div class="trig-icon">🔋</div>
+      <div class="trig-from">C → B1</div>
+      <div class="trig-title">借用主机排满 / 科室认可</div>
+      <div class="trig-body">1～3台借用主机每天排满，护士在抢着用；或科室主任主动问「这设备能不能买几台」。<br><b>此时推¥5万包，科主任当场可批，不走任何流程。</b></div>
+    </div>
+    <div class="trig">
+      <div class="trig-icon">⚡</div>
+      <div class="trig-from">B1 → B2</div>
+      <div class="trig-title">5台不够 / 工作站充电槽满</div>
+      <div class="trig-body">小工作站充电槽被占满，部分主机轮空等待；日均稳定超过5例，科主任开始觉得「效率不够，钱没赚够」。<br><b>亮出比价：扩容包¥4.8万 vs 升B2实付¥5万，引导选B2。</b></div>
+    </div>
+    <div class="trig">
+      <div class="trig-icon">🏥</div>
+      <div class="trig-from">B2 → A</div>
+      <div class="trig-title">多科室蔓延 / 院长看数据</div>
+      <div class="trig-body">其他科室看到本科室在用来咨询；或院长问「能不能看到全院的呼吸数据汇总」，HIS打通的需求自然浮现。<br><b>此时旗舰版是唯一完整解，B2顶配到A只差¥10万。</b></div>
+    </div>
+  </div>
+  <div class="info" style="margin-top:14px">
+    <b>经销商回访节奏建议：</b>进院后每月回访一次，带着「上月做了多少例、月净贡献¥X万」的数据去谈——让医院自己感受到「量不够、设备不够用」，升级是需求驱动，不是被推销。
+  </div>
+</div>
+
+<!-- ROI CALCULATOR -->
+<div class="card" style="padding:0;border:none;background:transparent;box-shadow:none;">
+  <div class="calc-wrap">
+    <div class="calc-title">⚡ 医院投资回报测算器</div>
+    <div class="calc-row">
+      <div class="ci">
+        <label>配置档位</label>
+        <select id="cfg" onchange="calcROI()">
+          <option value="c">C · 免费试用</option>
+          <option value="b1" selected>B1 · ¥5万基础包</option>
+          <option value="b1exp">B1+扩容包（¥9.8万）</option>
+          <option value="b2a">B2基础 ¥10万（B1抵后¥5万）</option>
+          <option value="b2b">B2标准 ¥20万</option>
+          <option value="b2c">B2完整 ¥40万</option>
+          <option value="a">A · 旗舰 ¥65万</option>
+        </select>
+      </div>
+      <div class="ci">
+        <label>月均测试量（次）</label>
+        <input type="number" id="volume" value="100" min="1" max="1000" oninput="calcROI()">
+      </div>
+      <div class="ci">
+        <label>医院收费均价（元）</label>
+        <input type="number" id="fee" value="250" min="100" max="500" oninput="calcROI()">
+      </div>
+      <div class="ci">
+        <label>已有B1抵扣</label>
+        <select id="credit" onchange="calcROI()">
+          <option value="0">否（全价购买）</option>
+          <option value="50000">是（抵扣¥5万）</option>
+        </select>
+      </div>
+    </div>
+    <div class="res-grid" id="roi-res"></div>
+    <div class="calc-foot" id="roi-foot"></div>
+  </div>
+</div>
+
+</div>
+<script>
+const cfgMap={
+  c:    {invest:0,      label:'C免费试用',    consumes:0,    packPrice:0   },
+  b1:   {invest:50000,  label:'B1 ¥5万',      consumes:50,   packPrice:90  },
+  b1exp:{invest:98000,  label:'B1+扩容 ¥9.8万',consumes:100, packPrice:90  },
+  b2a:  {invest:100000, label:'B2基础 ¥10万',  consumes:200,  packPrice:92  },
+  b2b:  {invest:200000, label:'B2标准 ¥20万',  consumes:500,  packPrice:90  },
+  b2c:  {invest:400000, label:'B2完整 ¥40万',  consumes:1000, packPrice:88  },
+  a:    {invest:650000, label:'A旗舰 ¥65万',   consumes:1500, packPrice:85  },
+};
+function fmt(n){return Math.abs(n)>=10000?'¥'+(n/10000).toFixed(1)+'万':'¥'+Math.round(n).toLocaleString('zh-CN');}
+function calcROI(){
+  const cfg=cfgMap[document.getElementById('cfg').value];
+  const vol=Math.max(1,parseInt(document.getElementById('volume').value)||1);
+  const fee=Math.max(100,parseInt(document.getElementById('fee').value)||250);
+  const credit=parseInt(document.getElementById('credit').value)||0;
+  const eff=Math.max(0,cfg.invest-credit);
+  const mRev=vol*fee;
+  const mCost=vol*120;
+  const mNet=mRev-mCost;
+  const pb=mNet>0&&eff>0?(eff/mNet).toFixed(1):'—';
+  const packSave=cfg.consumes*(120-cfg.packPrice);
+  const yr1=mNet*12-eff;
+
+  document.getElementById('roi-res').innerHTML=`
+    <div class="rc">
+      <div class="rc-lbl">设备实际投入<br>（抵扣后）</div>
+      <div class="rc-val">${fmt(eff)}</div>
+      <div class="rc-sub">${credit>0?'B1已抵¥5万':'无抵扣'}</div>
+    </div>
+    <div class="rc">
+      <div class="rc-lbl">月净贡献<br>（收费－耗材）</div>
+      <div class="rc-val" style="color:${mNet>0?'#6ee7b7':'#fca5a5'}">${fmt(mNet)}</div>
+      <div class="rc-sub">${vol}次×¥${fee} − ¥120</div>
+    </div>
+    <div class="rc">
+      <div class="rc-lbl">设备回本周期</div>
+      <div class="rc-val">${eff===0?'即用':pb+'月'}</div>
+      <div class="rc-sub">${eff===0?'零投入即启动':pb==='—'?'—':'约'+Math.ceil(pb)+'个月'}</div>
+    </div>
+    <div class="rc gc">
+      <div class="rc-lbl">首年净收益<br>（扣设备投入）</div>
+      <div class="rc-val">${fmt(yr1)}</div>
+      <div class="rc-sub">月净贡献×12 − 设备</div>
+    </div>
+    <div class="rc ec">
+      <div class="rc-lbl">耗材包节省<br>（vs挂网价）</div>
+      <div class="rc-val">${fmt(packSave)}</div>
+      <div class="rc-sub">${cfg.consumes}片×省${120-cfg.packPrice}元</div>
+    </div>
+  `;
+  document.getElementById('roi-foot').innerHTML=
+    `${cfg.label} · 月均${vol}次 · 收费¥${fee}/次 · 月净贡献${fmt(mNet)} · ${eff===0?'无设备投入':'回本'+pb+'个月'}`;
+}
+calcROI();
+</script>
+</body>
+</html>
